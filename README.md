@@ -60,12 +60,12 @@ Building
 
 To build `dreadlock`, you need Russ Cox's `libtask` library
 installed.  For running high concurrency `dreadlock` servers
-on linux, it's recommended to use this fork which supports
+on linux, it's recommended to use 
+[this fork](https://github.com/jamwt/libtask) which supports
 `epoll()` on linux.  The standard libtask has a fixed limit
 of 1024 sockets; the `epoll()`-enabled fork has no arbitrary
 limits (other than `ulimit`).
 
-https://github.com/jamwt/libtask
 
 `make` and `make install` will do it; `make all` will attempt
 to use `ragel` to rebuild the parsing state machine C file,
