@@ -174,7 +174,6 @@ void do_unlock(dreadlock_client_state *st, char *key, int len) {
 }
 
 void dreadlock_client(void *arg) {
-    tasksystem();
     dreadlock_client_state *st = (dreadlock_client_state *)arg;
     taskname(st->id);
 
@@ -205,7 +204,7 @@ void waker(void *p) {
             taskwakeup(timers->wake);
             DL_DELETE(timers, timers);
         }
-        taskdelay(10);
+        taskdelay(100);
     }
 }
 
