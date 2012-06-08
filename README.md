@@ -33,7 +33,8 @@ or
     t timeout\r\n
 
 Your client should raise an exception on `t timeout` (or
-return an error code, depending on language).
+return an error code, depending on language).  *Note:
+timeouts are +/- 100ms, so don't count on deadly accuracy.*
 
 Clients will be given the lock as it is released in
 first-come-first-serve order.  If a client's TCP connection
