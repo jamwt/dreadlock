@@ -75,7 +75,6 @@ void ragel_parse(dreadlock_client_state *st) {
     %% write init;
 
     while (1) {
-        printf("top!\n");
         int bread = fdread(st->fd, writeptr, canwrite);
         if (bread == 0)
             eof = writeptr;
@@ -94,7 +93,7 @@ void ragel_parse(dreadlock_client_state *st) {
         %% write exec;
 
         if (cs == command_error) {
-            fprintf(stderr, "syntax error from client!\n");
+            fprintf(stderr, "syntax error from client\n");
             break;
         }
 

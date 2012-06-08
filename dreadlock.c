@@ -47,7 +47,6 @@ void do_lock(dreadlock_client_state *st, char *key, int len, int timeout_ms) {
 
     /* Someone already owns */
     if (l) {
-        fprintf(stderr, "found entry!\n");
         dreadlock_claimant *c = l->waits->prev;
         if (c->id == taskid()) {
             send_string_response(st, "e already locked\r\n");
@@ -86,13 +85,11 @@ void do_lock(dreadlock_client_state *st, char *key, int len, int timeout_ms) {
         }
     }
     else {
-        fprintf(stderr, "not found!\n");
         l = malloc(sizeof(dreadlock_lock));
         l->waits = NULL;
         l->key = malloc(len + 1);
         memcpy(l->key, key, len);
         l->key[len] = 0;
-        fprintf(stderr, "locking %s\n", l->key);
 
         dreadlock_claimant *c = malloc(sizeof(dreadlock_claimant));
         bzero(&c->wait, sizeof(Rendez));
@@ -159,7 +156,6 @@ void dreadlock_client(void *arg) {
 
     ragel_parse(st);
 
-    printf("closing!\n");
     close(st->fd);
 
     /* cleanup held locks */
