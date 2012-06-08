@@ -134,7 +134,6 @@ void ragel_parse(dreadlock_client_state *st) {
 #line 76 "parse.rl"
 
     while (1) {
-        printf("top!\n");
         int bread = fdread(st->fd, writeptr, canwrite);
         if (bread == 0)
             eof = writeptr;
@@ -151,7 +150,7 @@ void ragel_parse(dreadlock_client_state *st) {
         pe = writeptr + bread;
 
         
-#line 155 "parse.c"
+#line 154 "parse.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -172,7 +171,7 @@ _resume:
 #line 1 "NONE"
 	{ts = p;}
 	break;
-#line 176 "parse.c"
+#line 175 "parse.c"
 		}
 	}
 
@@ -284,7 +283,7 @@ _match:
 #line 53 "parse.rl"
 	{te = p+1;}
 	break;
-#line 288 "parse.c"
+#line 287 "parse.c"
 		}
 	}
 
@@ -297,7 +296,7 @@ _again:
 #line 1 "NONE"
 	{ts = 0;}
 	break;
-#line 301 "parse.c"
+#line 300 "parse.c"
 		}
 	}
 
@@ -309,10 +308,10 @@ _again:
 	_out: {}
 	}
 
-#line 95 "parse.rl"
+#line 94 "parse.rl"
 
         if (cs == command_error) {
-            fprintf(stderr, "syntax error from client!\n");
+            fprintf(stderr, "syntax error from client\n");
             break;
         }
 

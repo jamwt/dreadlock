@@ -5,12 +5,15 @@
 #include <task.h>
 #include <assert.h>
 #include <errno.h>
+#include <sys/time.h>
 #include "utlist.h"
 #include "uthash.h"
 
 #include "dreadlock.h"
 
 static dreadlock_lock *locks;
+
+static dreadlock_timer *timers;
 
 void send_string_response(dreadlock_client_state *st, char *msg) {
     char *ptr = msg;
@@ -32,12 +35,29 @@ typedef struct background_info {
     int sleep_ms;
 } background_info;
 
-void background_wakeup(void *ptr) {
-    background_info *i = (background_info *)ptr;
-    taskdelay(i->sleep_ms);
-    if (i->r)
-        taskwakeup(i->r);
-    free(i);
+double now_in_double() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    double now = (double)tv.tv_sec;
+    now += tv.tv_usec * 0.000001;
+    return now;
+}
+
+double now_plus_ms(int ms) {
+    double msdelt = ms * 0.001;
+    double now = now_in_double();
+    return now + msdelt;
+}
+
+int timer_compare(void *p1, void *p2) {
+    dreadlock_timer *t1 = (dreadlock_timer *)p1;
+    dreadlock_timer *t2 = (dreadlock_timer *)p2;
+
+    if (t1->wake_at < t2->wake_at)
+        return -1;
+    if (t1->wake_at == t2->wake_at)
+        return 0;
+    return 1;
 }
 
 void do_lock(dreadlock_client_state *st, char *key, int len, int timeout_ms) {
@@ -56,16 +76,18 @@ void do_lock(dreadlock_client_state *st, char *key, int len, int timeout_ms) {
         bzero(&c->wait, sizeof(Rendez));
         c->id = taskid();
         c->won = 0;
+        c->next = NULL;
+        c->prev = NULL;
         DL_PREPEND(l->waits, c);
 
-        background_info *i = malloc(sizeof(background_info));
-        i->r = &c->wait;
-        i->sleep_ms = timeout_ms;
+        dreadlock_timer timer = {now_plus_ms(timeout_ms), &c->wait, NULL, NULL};
+        DL_APPEND(timers, &timer);
+        DL_SORT(timers, timer_compare);
 
-        taskcreate(background_wakeup, i, 32768);
         tasksleep(&c->wait);
+
         if (c->won)  {
-            i->r = NULL;
+            DL_DELETE(timers, &timer);
             dreadlock_user_lock *ul = malloc(sizeof(dreadlock_user_lock));
             ul->lock = l;
             ul->wait = c;
@@ -95,6 +117,8 @@ void do_lock(dreadlock_client_state *st, char *key, int len, int timeout_ms) {
         bzero(&c->wait, sizeof(Rendez));
         c->id = taskid();
         c->won = 1;
+        c->next = NULL;
+        c->prev = NULL;
         DL_PREPEND(l->waits, c);
         HASH_ADD_KEYPTR(hh, locks, l->key, len, l);
 
@@ -174,6 +198,17 @@ void dreadlock_client(void *arg) {
     taskexit(0);
 }
 
+void waker(void *p) {
+    while (1) {
+        double now = now_in_double();
+        while (timers && timers->wake_at < now) {
+            taskwakeup(timers->wake);
+            DL_DELETE(timers, timers);
+        }
+        taskdelay(10);
+    }
+}
+
 void taskmain(int argc, char *argv[]) {
     int port = argc > 1 ? atoi(argv[1]) : 6001;
     int boundfd = netannounce(TCP, NULL, port);
@@ -181,6 +216,8 @@ void taskmain(int argc, char *argv[]) {
         perror("dreadlock bind error");
         taskexitall(1);
     }
+
+    taskcreate(waker, NULL, 32768);
 
     while (1) {
         char server[16];

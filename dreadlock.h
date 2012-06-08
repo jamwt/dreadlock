@@ -4,6 +4,13 @@
 #include "utlist.h"
 #include "uthash.h"
 
+typedef struct dreadlock_timer {
+    double wake_at;
+    Rendez *wake;
+
+    struct dreadlock_timer *prev;
+    struct dreadlock_timer *next;
+} dreadlock_timer;
 
 typedef struct dreadlock_claimant {
     unsigned int id;
@@ -14,6 +21,7 @@ typedef struct dreadlock_claimant {
     struct dreadlock_claimant *prev;
     struct dreadlock_claimant *next;
 } dreadlock_claimant;
+
 
 typedef struct dreadlock_lock {
     char *key;

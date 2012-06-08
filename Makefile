@@ -3,7 +3,7 @@ noragel: dreadlock
 all: ragel dreadlock
 
 dreadlock: dreadlock.c parse.c dreadlock.h
-	gcc -o dreadlock -O2 -Wall -Werror -g -fno-strict-aliasing parse.c dreadlock.c -ltask
+	gcc -o dreadlock -g -O2 -Wall -Werror -fPIC -fno-strict-aliasing parse.c dreadlock.c -ltask
 
 ragel: parse.rl
 	ragel parse.rl
