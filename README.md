@@ -12,8 +12,10 @@ It talks over TCP and supports two commands.  First, `lock`:
 
 Issuing `lock` will block the calling client for `timeout`
 milliseconds until either the key is held exclusively by
-this client or the timeout elapses.  The response will
-be either:
+this client or the timeout elapses.  Keys must contain only
+ascii letters and digits.
+
+The response will be either:
 
     l locked\r\n
 
@@ -48,6 +50,10 @@ are always of the format:
 
 Your client should raise an exception and provide the `error message`
 as a descriptive string for the error.
+
+A protocol syntax error will cause the connection to be rudely
+dropped on your client (and dreadlock will print a warning
+to stderr).
 
 Building
 ========
