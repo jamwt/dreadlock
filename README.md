@@ -1,7 +1,16 @@
 Dreadlock
 =========
 
-Dreadlock is a simple + fast network-locking daemon.  
+Dreadlock is a simple + fast network-locking daemon.  A client
+can connect to dreadlock over TCP and ensure exclusive access
+to a particular resource.
+
+*Note: due to network partitions and things of that nature,
+this is only a SOFT guarantee of exclusivity; don't use this
+program for banking.  It is optimized for speedy locking,
+not safe locking.  Something like zookeeper is better
+for safe locking.*
+
 
 Protocol
 --------
