@@ -78,7 +78,7 @@ void ragel_parse(dreadlock_client_state *st) {
         int bread = fdread(st->fd, writeptr, canwrite);
         if (bread == 0)
             eof = writeptr;
-        if (bread < 0) {
+        else if (bread < 0) {
             switch (errno) {
                 case EINTR: continue;
                 default:
