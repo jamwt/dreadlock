@@ -84,6 +84,7 @@ void ragel_parse(dreadlock_client_state *st) {
                 default:
                     perror("dreadlock client read");
                     eof = writeptr;
+                    bread = 0;
             }
         }
 
