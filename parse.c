@@ -400,6 +400,7 @@ case 19:
             ts = buf;
             te = buf + have;
             canwrite = PARSE_BUFSIZ - have;
+            writeptr = buf + have;
         }
         else {
             writeptr = buf;

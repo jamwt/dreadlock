@@ -107,6 +107,7 @@ void ragel_parse(dreadlock_client_state *st) {
             ts = buf;
             te = buf + have;
             canwrite = PARSE_BUFSIZ - have;
+            writeptr = buf + have;
         }
         else {
             writeptr = buf;
