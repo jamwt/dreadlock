@@ -30,11 +30,6 @@ void send_string_response(dreadlock_client_state *st, char *msg) {
     }
 }
 
-typedef struct background_info {
-    Rendez *r;
-    int sleep_ms;
-} background_info;
-
 double now_in_double() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
